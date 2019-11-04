@@ -2,41 +2,44 @@
 
 namespace App\Http\Controllers;
 
+use App\Category;
+use App\Http\Requests\StorePostRequest;
+use App\Http\Requests\UpdatePostRequest;
 use App\Post;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Request;
 
 class PostsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        $posts = Post::paginate(5);
-        return view('posts.index')->with('posts', $posts);
+        if(Request::has('user_id')) {
+            $posts = Post::byUser(Request::input('user_id'));
+        } else {
+            $posts = Post::query();
+        }
+
+        $posts = $posts->orderBy('created_at', 'desc')->paginate(5);
+        return view('posts.index', compact('posts'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
-        //
+        $categoriesDropdown = Category::pluck('name', 'id');
+        return view('posts.create', compact('categoriesDropdown'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    public function store(StorePostRequest $request)
     {
-        //
+        $post = Post::make($request->all());
+        $post->user_id = auth()->user()->id;
+
+        if($post->save()){
+            session()->flash('alert-success', 'Post created successfully');
+            return redirect()->to('posts');
+        } else {
+            session()->flash('alert-danger', 'Unable to create post. Please try again');
+            return back()->withInput();
+        }
     }
 
     public function show(Post $post)
@@ -44,37 +47,31 @@ class PostsController extends Controller
         return view('posts.show')->with('post', $post);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
+    public function edit(Post $post)
     {
-        //
+        $categoriesDropdown = Category::pluck('name', 'id');
+        return view('posts.edit', compact('post'))
+                ->with('categoriesDropdown', $categoriesDropdown);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
+    public function update(UpdatePostRequest $request, Post $post)
     {
-        //
+        if ($post->update($request->all())) {
+            session()->flash('alert-success', 'Post updated successfully');
+            return redirect()->route('posts.index', ['user_id' => auth()->user()->id]);
+        } else {
+            session()->flash('alert-danger', 'Unable to update post. Please try again');
+            return back()->withInput();
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
+    public function destroy(Post $post)
     {
-        //
+        if ($post->delete()) {
+            session()->flash('alert-success', 'Post deleted successfully');
+        } else {
+            session()->flash('alert-danger', 'Unable to delete post. Please try again');
+        }
+        return back();
     }
 }

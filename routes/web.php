@@ -21,4 +21,4 @@ Route::get('/home', 'HomeController@index')
     ->name('home')
     ->middleware('verified');
 
-Route::apiResource('posts', 'PostsController');
+Route::resource('posts', 'PostsController');
