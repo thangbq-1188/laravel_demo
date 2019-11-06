@@ -14,10 +14,7 @@ class UpdatePostRequest extends FormRequest
      */
     public function authorize()
     {
-        $postId = 6;
-
-        return Post::where('id', $postId)
-                ->where('user_id', auth()->user()->id)->exists();
+        //
     }
 
     /**
