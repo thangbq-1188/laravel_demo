@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Request;
 
 class PostsController extends Controller
 {
+    public function __construct() {
+        $this->middleware('can:create,App\Post', ['only' => ['store', 'create']]);
+        $this->middleware('can:update,post', ['only' => ['edit', 'update']]);
+        $this->middleware('can:delete,post', ['only' => 'destroy']);
+    }
+
     public function index()
     {
         if(Request::has('user_id')) {
