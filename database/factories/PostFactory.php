@@ -2,9 +2,9 @@
 
 /** @var \Illuminate\Database\Eloquent\Factory $factory */
 
-use App\Category;
-use App\Post;
-use App\User;
+use App\Models\Category;
+use App\Models\Post;
+use App\Models\User;
 use Faker\Generator as Faker;
 
 $factory->define(Post::class, function (Faker $faker) {

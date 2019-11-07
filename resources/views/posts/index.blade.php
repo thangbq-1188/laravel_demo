@@ -33,5 +33,5 @@
         </div>
     @endforeach
 
-    {{ $posts->appends(['user_id' => app('request')->input('user_id')])->links() }}
+    {{ $posts->appends(app('request')->input())->links() }}
 @endsection

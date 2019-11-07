@@ -2,26 +2,32 @@
 
 namespace App\Http\Controllers;
 
-use App\Category;
+use App\Models\Category;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
-use App\Post;
+use App\Models\Post;
 use Illuminate\Support\Facades\Request;
 
 class PostsController extends Controller
 {
     public function __construct() {
-        $this->middleware('can:create,App\Post', ['only' => ['store', 'create']]);
+        $this->middleware('can:create,App\Models\Post', ['only' => ['store', 'create']]);
         $this->middleware('can:update,post', ['only' => ['edit', 'update']]);
         $this->middleware('can:delete,post', ['only' => 'destroy']);
     }
 
     public function index()
     {
-        if(Request::has('user_id')) {
-            $posts = Post::byUser(Request::input('user_id'));
-        } else {
-            $posts = Post::query();
+        switch (true) {
+            case Request::has('user_id'):
+                $posts = Post::byUser(Request::input('user_id'));
+                break;
+            case Request::has('category_id'):
+                $posts = Post::byCategory(Request::input('category_id'));
+                break;
+            default:
+                $posts = Post::query();
+                break;
         }
 
         $posts = $posts->orderBy('created_at', 'desc')->paginate(5);
@@ -41,7 +47,7 @@ class PostsController extends Controller
 
         if($post->save()){
             session()->flash('alert-success', 'Post created successfully');
-            return redirect()->to('posts');
+            return redirect()->route('posts.index', ['user_id' => auth()->user()->id]);
         } else {
             session()->flash('alert-danger', 'Unable to create post. Please try again');
             return back()->withInput();
