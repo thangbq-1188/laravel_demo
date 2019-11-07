@@ -22,3 +22,4 @@ Route::get('/home', 'HomeController@index')
     ->middleware('verified');
 
 Route::resource('posts', 'PostsController');
+Route::post('subscribers', 'SubscribersController@store');

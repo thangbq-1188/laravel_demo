@@ -10,9 +10,11 @@
     "require": {
         "php": "^7.2",
         "barryvdh/laravel-cors": "^0.11.4",
+        "barryvdh/laravel-debugbar": "^3.2",
         "fideloper/proxy": "^4.0",
         "laravel/framework": "^6.2",
         "laravel/helpers": "^1.1",
+        "laravel/horizon": "^3.4",
         "laravel/passport": "^8.0",
         "laravel/tinker": "^1.0",
         "laravelcollective/html": "^6.0"
