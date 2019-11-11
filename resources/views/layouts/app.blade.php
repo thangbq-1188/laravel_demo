@@ -22,7 +22,7 @@
 <body>
     <div id="app">
         @include('layouts._nav')
-
+        @include('layouts._subscriber')
         <main class="py-4">
             <div class="container">
                 <div class="row">
@@ -48,4 +48,6 @@
         </main>
     </div>
 </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script type="text/javascript" src="{{ URL::asset('js/subscribe.js') }}"></script>
 </html>

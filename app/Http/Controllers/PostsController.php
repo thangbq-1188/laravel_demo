@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
 use App\Http\Requests\StorePostRequest;
 use App\Http\Requests\UpdatePostRequest;
+use App\Jobs\SendNewsLetter;
+use App\Models\Category;
 use App\Models\Post;
 use Illuminate\Support\Facades\Request;
 
@@ -30,7 +31,7 @@ class PostsController extends Controller
                 break;
         }
 
-        $posts = $posts->orderBy('created_at', 'desc')->paginate(5);
+        $posts = $posts->with('user')->orderBy('created_at', 'desc')->paginate(5);
         return view('posts.index', compact('posts'));
     }
 
@@ -47,6 +48,7 @@ class PostsController extends Controller
 
         if($post->save()){
             session()->flash('alert-success', 'Post created successfully');
+            dispatch(new SendNewsLetter());
             return redirect()->route('posts.index', ['user_id' => auth()->user()->id]);
         } else {
             session()->flash('alert-danger', 'Unable to create post. Please try again');
